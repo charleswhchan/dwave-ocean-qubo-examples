@@ -3,5 +3,6 @@ Implementation of QUBO examples from [A Tutorial on Formulating and Using QUBO M
 
 - [Section 2: Illustrative Examples and Definitions](examples/section2.py)
 - Section 3: Natural QUBO Formulations
+  - [Section 3.1: The Number Partitioning Problem](examples/section3.1.py)
 - Section 4: Creating QUBO Models Using Known Penalties
 - Section 5: Creating QUBO Models Using a General Purpose Approach

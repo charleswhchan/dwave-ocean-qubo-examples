@@ -122,8 +122,7 @@ for sample in sample_set.samples():
 print '#'*80
 
 sampler = EmbeddingComposite(DWaveSampler())
-esponse = sampler.sample(bqm)
-sample_set = sample_set.truncate(5)
+sample_set = sampler.sample(bqm, num_reads=10)
 print "Using DWaveSampler()"
 print sample_set
 for sample in sample_set.samples():
@@ -131,15 +130,19 @@ for sample in sample_set.samples():
     print "list1: {}, sum: {}, list2: {}, sum: {}".format(list1, sum(list1), list2, sum(list2))
 
 # Using DWaveSampler()
-#    1  2  3  4  5  6  7  8  energy num_oc.
-# 0  0  0  0  1  1  0  0  1 -6889.0       1
-# 1  1  1  0  1  0  0  1  0 -6888.0       1
-# 2  1  1  1  1  0  0  0  1 -6880.0       1
-# 3  0  0  0  0  1  1  1  0 -6880.0       1
-# 4  1  0  1  0  1  0  0  0 -6880.0       1
-# ['BINARY', 5 rows, 5 samples, 8 variables]
-# list1: [31, 42, 10], sum: 83, list2: [25, 7, 13, 17, 21], sum: 83
-# list1: [25, 7, 31, 21], sum: 84, list2: [13, 42, 17, 10], sum: 82
-# list1: [25, 7, 13, 31, 10], sum: 86, list2: [42, 17, 21], sum: 80
-# list1: [42, 17, 21], sum: 80, list2: [25, 7, 13, 31, 10], sum: 86
-# list1: [25, 13, 42], sum: 80, list2: [7, 31, 17, 21, 10], sum: 86
+#    1  2  3  4  5  6  7  8  energy num_oc. chain_.
+# 0  1  1  1  0  0  1  1  0 -6889.0       2    0.75
+# 6  0  1  0  0  1  1  1  0 -6873.0       1   0.875
+# 1  0  0  1  1  1  0  0  1 -6720.0       1   0.875
+# 5  0  1  1  0  1  1  1  0 -6600.0       3     1.0
+# 3  0  1  1  0  0  1  1  0 -6264.0       1   0.875
+# 4  1  1  0  1  1  0  0  1 -5865.0       1   0.875
+# 2  1  1  1  0  1  1  1  0 -5125.0       1   0.875
+# ['BINARY', 7 rows, 10 samples, 8 variables]
+# list1: [25, 7, 13, 17, 21], sum: 83, list2: [31, 42, 10], sum: 83
+# list1: [7, 42, 17, 21], sum: 87, list2: [25, 13, 31, 10], sum: 79
+# list1: [13, 31, 42, 10], sum: 96, list2: [25, 7, 17, 21], sum: 70
+# list1: [7, 13, 42, 17, 21], sum: 100, list2: [25, 31, 10], sum: 66
+# list1: [7, 13, 17, 21], sum: 58, list2: [25, 31, 42, 10], sum: 108
+# list1: [25, 7, 31, 42, 10], sum: 115, list2: [13, 17, 21], sum: 51
+# list1: [25, 7, 13, 42, 17, 21], sum: 125, list2: [31, 10], sum: 41

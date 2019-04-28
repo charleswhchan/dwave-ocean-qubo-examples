@@ -81,20 +81,11 @@ print '#'*80
 # 
 # For more information about the DWaveSampler(), refer to https://dwave-systemdocs.readthedocs.io/en/latest/reference/samplers/dwave_sampler.html#module-dwave.system.samplers.dwave_sampler
 sampler = EmbeddingComposite(DWaveSampler())
-esponse = sampler.sample(bqm)
+sample_set = sampler.sample(bqm)
 print "Using DWaveSampler()"
 print sample_set
 
 # Using DWaveSampler()
-#    1  2  3  4 energy num_oc.
-# 0  1  0  0  1  -11.0       1
-# 1  1  0  0  1  -11.0       1
-# 2  1  0  0  1  -11.0       1
-# 3  1  0  0  1  -11.0       1
-# 4  1  0  0  1  -11.0       1
-# 5  1  0  0  1  -11.0       1
-# 6  1  0  0  1  -11.0       1
-# 7  1  0  0  1  -11.0       1
-# 8  1  0  0  1  -11.0       1
-# 9  1  0  0  1  -11.0       1
-# ['BINARY', 10 rows, 10 samples, 4 variables]
+#    1  2  3  4 energy num_oc. chain_.
+# 0  1  0  0  1  -11.0       1     0.0
+# ['BINARY', 1 rows, 1 samples, 4 variables]

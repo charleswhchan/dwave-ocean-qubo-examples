@@ -2,7 +2,7 @@
 Section 3.1 The Number Partitioning Problem
 Partition a set of numbers into two subsets such that the subset sums are as close to each other as possible.
 
-Test list size 50
+Test list size 50 - small enough to be solved on the D-Wave 2000Q
 """
 
 import copy
@@ -71,11 +71,10 @@ dwave_sampler = EmbeddingComposite(DWaveSampler())
 
 print "#"*80
 numbers = generate_numbers(50)  # generate a list of numbers to be split into equal sums
-# numbers = [25,7,13,31,42,17,21,10]
 bqm = to_bqm(numbers)
 
 #
-# ExactSolver does not work when list has many items eg. len(numbers) == 100
+# ExactSolver fails when list has many items eg. len(numbers) == 100
 #
 # start = time.time()
 # sample_set = solve(exact_solver, bqm)
@@ -142,7 +141,7 @@ print ""
 # list1: [448, 490, 834, 608, 488, 295, 455, 174, 911, 977, 107, 67, 588, 239, 264, 88, 766, 980, 209, 345, 170, 256, 998, 102, 993, 514, 673, 696, 561, 417, 267, 6, 531, 602], sum: 16119, list2: [871, 112, 324, 902, 762, 500, 523, 71, 564, 266, 280, 24, 86, 206, 566, 996], sum: 7053
 
 #
-# The result does not look too good, let's try again with larger num_reads
+# The result does not look optimal, let's try again with larger num_reads
 #
 start = time.time()
 sample_set = solve(dwave_sampler, bqm, num_reads=1000)

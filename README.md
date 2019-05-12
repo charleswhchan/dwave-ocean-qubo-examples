@@ -4,8 +4,8 @@ Implement examples from [A Tutorial on Formulating and Using QUBO Models](https:
 - [Section 2: Illustrative Examples and Definitions](examples/section2.py)
 - Section 3: Natural QUBO Formulations
   - [Section 3.1: The Number Partitioning Problem](examples/section3.1.py)
-    - [List size 50](examples/section3.1-1.py)
-    - [List size 100](examples/section3.1-2.py)
+    - [List size 50](examples/section3.1-1.py) (using minor-embedding on D-Wave 2000Q)
+    - [List size 100](examples/section3.1-2.py) (using dwave-hybrid to decomposite the problem)
   - [Section 3.2: The Max Cut Problem](examples/section3.2.py)
 - Section 4: Creating QUBO Models Using Known Penalties
 - Section 5: Creating QUBO Models Using a General Purpose Approach

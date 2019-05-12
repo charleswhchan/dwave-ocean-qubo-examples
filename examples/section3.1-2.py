@@ -2,8 +2,8 @@
 Section 3.1 The Number Partitioning Problem
 Partition a set of numbers into two subsets such that the subset sums are as close to each other as possible.
 
-Test list size 100 - too big to solve on the D-Wave 2000Q, so we have to use
-a decomposer to break the large problem into sub-problems.
+Test list size 100 - too big to solve on the D-Wave 2000Q using minor-embedding, 
+so we have to use a decomposer to break the large problem into sub-problems.
 """
 
 import copy
@@ -74,19 +74,11 @@ numbers = generate_numbers(100)  # generate a list of numbers to be split into e
 bqm = to_bqm(numbers)
 
 # Redefine the workflow: a rolling decomposition window
-subproblem = hybrid.EnergyImpactDecomposer(size=50, rolling_history=0.15)
-subsampler = hybrid.QPUSubproblemAutoEmbeddingSampler() | hybrid.SplatComposer()
+decomposer = hybrid.EnergyImpactDecomposer(size=50, rolling_history=0.15)
+sampler = hybrid.QPUSubproblemAutoEmbeddingSampler() 
+composer = hybrid.SplatComposer()
 
-iteration = hybrid.RacingBranches(
-    subproblem | subsampler
-) | hybrid.ArgMin()
-
-subsampler = hybrid.Map(
-    hybrid.QPUSubproblemAutoEmbeddingSampler()
-) | hybrid.Reduce(
-    hybrid.Lambda(merge_substates)
-) | hybrid.SplatComposer()
-
+iteration = hybrid.RacingBranches(decomposer | sampler | composer) | hybrid.ArgMin()
 
 workflow = hybrid.LoopUntilNoImprovement(iteration, convergence=3)
 
@@ -106,4 +98,27 @@ print ""
 # ['BINARY', 1 rows, 1 samples, 100 variables]
 # list1: [447, 112, 485, 293, 452, 173, 106, 66, 320, 235, 259, 87, 204, 336, 165, 248, 104, 98, 68, 471, 255, 269, 466, 23, 82, 397, 254, 6, 196, 241, 423, 402, 80, 309, 152, 435, 478, 231, 130, 377, 477, 407, 261, 39, 418, 17, 111, 333, 464, 1], sum: 12463, list2: [871, 488, 831, 605, 902, 966, 579, 983, 750, 883, 958, 744, 591, 486, 507, 988, 959, 496, 648, 669, 541, 537, 504, 956, 944, 569, 864, 985, 521, 601, 916, 581, 715, 926, 889, 820, 787, 526, 666, 987, 533, 499, 665, 742, 913, 679, 868, 845, 783, 673], sum: 36939
 
-# TODO: Optimize the solution
+# Change rolling_history=0.5, traversal='bfs' and num_reads=1000
+decomposer = hybrid.EnergyImpactDecomposer(size=50, rolling_history=0.5, traversal='bfs')
+sampler = hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=1000) 
+composer = hybrid.SplatComposer()
+
+iteration = hybrid.RacingBranches(decomposer | sampler | composer) | hybrid.ArgMin()
+
+workflow = hybrid.LoopUntilNoImprovement(iteration, convergence=3)
+
+init_state = hybrid.State.from_problem(bqm)
+
+start = time.time()
+final_state = workflow.run(init_state).result()
+end = time.time()
+print "Using dwave-hybrid (elapsed time: {}s)".format(end-start)
+print(final_state.samples)
+print_result(final_state.samples)
+print ""
+
+# Using dwave-hybrid (elapsed time: 30.7170920372s)
+#    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 ... 100       energy num_oc.
+# 0  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1 ...   1 -605135232.0       1
+# ['BINARY', 1 rows, 1 samples, 100 variables]
+# list1: [871, 447, 112, 488, 831, 605, 485, 293, 452, 173, 902, 966, 106, 66, 320, 579, 235, 259, 983, 87, 750, 883, 958, 744, 204, 336, 165, 591, 248, 486, 507, 104, 988, 98, 959, 496, 68, 648, 471, 669, 541, 255, 269, 537, 466, 23, 82, 397, 254, 6, 1], sum: 22464, list2: [196, 504, 956, 944, 569, 864, 241, 985, 521, 601, 916, 581, 715, 926, 889, 820, 423, 402, 787, 80, 309, 526, 152, 666, 435, 478, 231, 130, 377, 987, 533, 477, 499, 665, 407, 742, 261, 39, 418, 913, 679, 17, 868, 845, 111, 333, 783, 673, 464], sum: 26938

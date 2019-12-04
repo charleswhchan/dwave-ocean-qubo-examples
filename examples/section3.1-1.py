@@ -13,63 +13,69 @@ import time
 from dwave.system.samplers import DWaveSampler
 from dwave.system.composites import EmbeddingComposite
 
+
 def generate_numbers(num_numbers):
     random.seed(51229)
-    numbers = random.sample(xrange(1, 1000), num_numbers)
+    numbers = random.sample(range(1, 1000), num_numbers)
     return numbers
+
 
 def to_bqm(numbers):
     c = sum(numbers)
-    c_square = c**c
+    c_square = c ** c
 
     linear = {}
     quadratic = {}
     offset = 0.0
     vartype = dimod.BINARY
     for index, value in enumerate(numbers):
-        linear[index+1] = value * (value - c)
+        linear[index + 1] = value * (value - c)
     for index1, value1 in enumerate(numbers[:-1]):
-        for index2 in range(index1+1, len(numbers)):
+        for index2 in range(index1 + 1, len(numbers)):
             value = value1 * numbers[index2]
-            idx = (index1+1, index2+1)
+            idx = (index1 + 1, index2 + 1)
             quadratic[idx] = quadratic[tuple(reversed(idx))] = value
 
-    bqm = dimod.BinaryQuadraticModel(
-        linear, 
-        quadratic, 
-        offset, 
-        vartype)
-    print len(linear)
-    print len(quadratic)
+    bqm = dimod.BinaryQuadraticModel(linear, quadratic, offset, vartype)
+    print(len(linear))
+    print(len(quadratic))
     return bqm
+
 
 def solve(sampler, bqm, num_reads=None):
     params = {}
     if num_reads:
-        params['num_reads'] = num_reads
+        params["num_reads"] = num_reads
     return sampler.sample(bqm, **params)
+
 
 def split_numbers_list(numbers, result):
     list1 = []
     list2 = []
     for key, include_in_list in result.items():
-        index = key-1
+        index = key - 1
         if include_in_list:
             list1.append(numbers[index])
         else:
             list2.append(numbers[index])
     return list1, list2
 
+
 def print_result(sample_set):
     for sample in sample_set.samples():
         list1, list2 = split_numbers_list(numbers, sample)
-        print "list1: {}, sum: {}, list2: {}, sum: {}".format(list1, sum(list1), list2, sum(list2))
+        print(
+            "list1: {}, sum: {}, list2: {}, sum: {}".format(
+                list1, sum(list1), list2, sum(list2)
+            )
+        )
+
 
 exact_solver = dimod.ExactSolver()
 simulated_annealing_sampler = dimod.SimulatedAnnealingSampler()
 dwave_sampler = EmbeddingComposite(DWaveSampler())
 
-print "#"*80
+print("#" * 80)
 numbers = generate_numbers(50)  # generate a list of numbers to be split into equal sums
 bqm = to_bqm(numbers)
 
@@ -88,11 +94,11 @@ bqm = to_bqm(numbers)
 start = time.time()
 sample_set = solve(simulated_annealing_sampler, bqm)
 end = time.time()
-print "Using SimulatedAnnlearingSampler (elapsed time: {}s)".format(end-start)
+print("Using SimulatedAnnlearingSampler (elapsed time: {}s)".format(end - start))
 sample_set = sample_set.truncate(5)
-print sample_set
+print(sample_set)
 print_result(sample_set)
-print ""
+print("")
 
 # Using Simulated (elapsed time: 15.2062799931s)
 #    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 ... 50       energy num_oc.
@@ -111,10 +117,10 @@ print ""
 start = time.time()
 sample_set = solve(dwave_sampler, bqm, num_reads=10)
 end = time.time()
-print "Using DWaveSampler (elapsed time: {}s)".format(end-start)
-print sample_set
+print("Using DWaveSampler (elapsed time: {}s)".format(end - start))
+print(sample_set)
 print_result(sample_set)
-print ""
+print("")
 
 # Using DWaveSampler (elapsed time: 5.94733715057s)
 #    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 ... 50       energy num_oc. ...
@@ -146,11 +152,11 @@ print ""
 start = time.time()
 sample_set = solve(dwave_sampler, bqm, num_reads=1000)
 end = time.time()
-print "Using DWaveSampler (elapsed time: {}s)".format(end-start)
+print("Using DWaveSampler (elapsed time: {}s)".format(end - start))
 sample_set = sample_set.truncate(100)
-print sample_set
+print(sample_set)
 print_result(sample_set)
-print ""
+print("")
 
 # Using DWaveSampler (elapsed time: 11.7918388844s)
 #     1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 ... 50       energy num_oc. ...
